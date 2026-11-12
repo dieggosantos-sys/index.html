@@ -1,0 +1,1038 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Bibli: reserve, renove e receba avisos de devolução da biblioteca da sua escola.">
+<title>Bibli: biblioteca escolar</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E📚%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+<!-- =====================================================
+     ESTILOS
+     ===================================================== -->
+<style>
+
+/* ---------- 1. Cores e temas ---------- */
+
+:root {
+  --bg:   #eef1f7;
+  --card: #ffffff;
+  --ink:  #0f1f3d;
+  --mut:  #56627a;
+  --line: #dde3ef;
+  --acc:  #f2a541;
+  --accd: #8a4f00;
+  --ok:   #1f7a6e;
+  --bad:  #b3314d;
+  --wa:   #d9f7c5;
+  --chat: #e9e4dc;
+  --btn:  #0f1f3d;
+  --btnt: #ffffff;
+  --nav:  #0f1f3d;
+
+  color-scheme: light;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:   #0b1526;
+    --card: #14253f;
+    --ink:  #eef1f7;
+    --mut:  #a3b1c8;
+    --line: #25405f;
+    --accd: #f2a541;
+    --ok:   #52c7b8;
+    --bad:  #ff8fa3;
+    --wa:   #1f5a47;
+    --chat: #1b2b3d;
+    --btn:  #f2a541;
+    --btnt: #0f1f3d;
+    --nav:  #0a1424;
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg:   #0b1526;
+  --card: #14253f;
+  --ink:  #eef1f7;
+  --mut:  #a3b1c8;
+  --line: #25405f;
+  --accd: #f2a541;
+  --ok:   #52c7b8;
+  --bad:  #ff8fa3;
+  --wa:   #1f5a47;
+  --chat: #1b2b3d;
+  --btn:  #f2a541;
+  --btnt: #0f1f3d;
+  --nav:  #0a1424;
+
+  color-scheme: dark;
+}
+
+
+/* ---------- 2. Base ---------- */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.5 Figtree, system-ui, Arial, sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Bricolage Grotesque', Figtree, sans-serif;
+  margin: 0;
+  line-height: 1.15;
+}
+
+h2 {
+  font-size: 21px;
+  margin-bottom: 10px;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 16px;
+  background: var(--btn);
+  color: var(--btnt);
+  font-weight: 700;
+  transition: transform .12s, opacity .12s;
+}
+
+button:hover {
+  opacity: .92;
+}
+
+button:active {
+  transform: scale(.98);
+}
+
+button:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+button.s {
+  background: transparent;
+  color: inherit;
+  border: 1px solid var(--line);
+}
+
+button.s:hover {
+  border-color: var(--acc);
+  opacity: 1;
+}
+
+button.lnk {
+  background: none;
+  padding: 2px 0;
+  color: var(--accd);
+  text-decoration: underline;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--acc);
+  outline-offset: 2px;
+}
+
+input,
+select {
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--ink);
+  max-width: 100%;
+  width: 100%;
+}
+
+input:focus {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 30%, transparent);
+  outline: none;
+}
+
+.mut {
+  color: var(--mut);
+  font-size: 14px;
+}
+
+.ok {
+  color: var(--ok);
+}
+
+.bad {
+  color: var(--bad);
+}
+
+.tag {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: var(--line);
+}
+
+.tag.ok {
+  background: color-mix(in srgb, var(--ok) 16%, transparent);
+}
+
+
+/* ---------- 3. Telas de entrada ---------- */
+
+.auth {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(320px, 5fr) 6fr;
+}
+
+.hero {
+  background: var(--nav);
+  color: #f4f6fb;
+  padding: 48px 44px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.hero .logo {
+  font: 800 26px 'Bricolage Grotesque', sans-serif;
+  letter-spacing: -.5px;
+}
+
+.hero h1 {
+  font-size: clamp(30px, 3.6vw, 46px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  max-width: 11em;
+  margin-top: 56px;
+}
+
+.hero p {
+  color: #b7c3da;
+  max-width: 26em;
+  margin: 14px 0 0;
+}
+
+.shelf {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  margin-top: 40px;
+  border-bottom: 8px solid #f2a541;
+  padding: 0 4px;
+}
+
+.shelf i {
+  display: block;
+  width: var(--w);
+  height: var(--h);
+  background: var(--c);
+  border-radius: 3px 3px 0 0;
+  box-shadow:
+    inset 0 14px 0 -10px rgba(255, 255, 255, .35),
+    inset 0 -22px 0 -18px rgba(255, 255, 255, .3);
+}
+
+.shelf i:nth-child(5n) {
+  transform: rotate(-6deg);
+  transform-origin: bottom left;
+  margin-right: 10px;
+}
+
+.pane {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+}
+
+.box {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 34px 32px;
+  box-shadow: 0 24px 48px -28px rgba(15, 31, 61, .35);
+}
+
+.box h2 {
+  font-size: 30px;
+  letter-spacing: -.5px;
+  margin-bottom: 6px;
+}
+
+.box > p {
+  margin: 0 0 22px;
+  color: var(--mut);
+}
+
+.step {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accd);
+  margin-bottom: 8px;
+}
+
+form.g {
+  display: grid;
+  gap: 14px;
+}
+
+label {
+  display: grid;
+  gap: 5px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.code {
+  letter-spacing: .5em;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.err {
+  background: color-mix(in srgb, var(--bad) 13%, transparent);
+  color: var(--bad);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+
+.err[hidden] {
+  display: none;
+}
+
+.good {
+  background: color-mix(in srgb, var(--ok) 15%, transparent);
+  color: var(--ok);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+
+.split {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.alt {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 10px;
+  text-align: center;
+}
+
+.demo {
+  margin-top: 18px;
+  font-size: 14px;
+}
+
+.demo summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--mut);
+}
+
+.demo div {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+
+/* ---------- 4. Sistema (aluno e bibliotecária) ---------- */
+
+.top {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 10;
+  background: var(--nav);
+  color: #f4f6fb;
+  padding: 12px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.top .logo {
+  font: 800 22px 'Bricolage Grotesque', sans-serif;
+}
+
+.top button.s {
+  border-color: #3b5578;
+  color: #f4f6fb;
+}
+
+.sim {
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+  padding: 8px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-size: 14px;
+}
+
+.sim button {
+  padding: 5px 10px;
+  font-size: 13px;
+}
+
+main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 20px 110px;
+}
+
+.hello {
+  margin-bottom: 18px;
+}
+
+.hello h1 {
+  font-size: 28px;
+  letter-spacing: -.5px;
+}
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid var(--line);
+}
+
+.tabs button {
+  background: none;
+  color: var(--mut);
+  border-radius: 0;
+  padding: 10px 14px;
+  margin-bottom: -2px;
+  border-bottom: 3px solid transparent;
+}
+
+.tabs button.on {
+  color: var(--ink);
+  border-bottom-color: var(--acc);
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 14px;
+  box-shadow:
+    0 1px 2px rgba(15, 31, 61, .05),
+    0 10px 24px -16px rgba(15, 31, 61, .18);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  transition: background .15s;
+}
+
+.card > .row:first-of-type,
+h2 + .row {
+  border-top: 0;
+}
+
+.flash {
+  padding: 11px 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--ok) 15%, transparent);
+  color: var(--ok);
+}
+
+.flash.bad {
+  background: color-mix(in srgb, var(--bad) 13%, transparent);
+  color: var(--bad);
+}
+
+.inl {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.inl > * {
+  flex: 1;
+  min-width: 140px;
+}
+
+details.card summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+details.card ol {
+  padding-left: 20px;
+}
+
+
+/* ---------- 5. WhatsApp simulado ---------- */
+
+.fab {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 20;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .28);
+  border-radius: 99px;
+  background: #1f9d5c;
+  color: #fff;
+  padding: 12px 18px;
+}
+
+.fab:hover {
+  transform: translateY(-2px);
+  opacity: 1;
+}
+
+.fab b {
+  background: #fff;
+  color: #1f9d5c;
+  border-radius: 99px;
+  padding: 0 7px;
+  margin-left: 6px;
+  font-size: 13px;
+}
+
+.drawer {
+  position: fixed;
+  right: 16px;
+  bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  z-index: 21;
+  width: 340px;
+  max-width: calc(100vw - 32px);
+  background: #1e1e24;
+  border-radius: 26px;
+  padding: 9px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .4);
+}
+
+.scr {
+  background: var(--chat);
+  border-radius: 19px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: min(480px, 62vh);
+  color: var(--ink);
+}
+
+.ph {
+  background: #0f1f3d;
+  color: #fff;
+  padding: 11px 13px;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.ph select {
+  width: auto;
+  max-width: 130px;
+  font-size: 13px;
+  padding: 4px;
+}
+
+.ph button {
+  padding: 2px 8px;
+  background: transparent;
+  color: #fff;
+  font-size: 20px;
+}
+
+.msgs {
+  flex: 1;
+  overflow: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.b {
+  max-width: 85%;
+  padding: 8px 11px;
+  border-radius: 12px;
+  background: var(--card);
+  font-size: 14px;
+}
+
+.b.me {
+  align-self: flex-end;
+  background: var(--wa);
+}
+
+.b small {
+  display: block;
+  color: var(--mut);
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.in {
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  background: var(--card);
+}
+
+.in input {
+  flex: 1;
+  min-width: 0;
+}
+
+.in button {
+  padding: 8px 12px;
+}
+
+
+/* ---------- 6. Telas pequenas e acessibilidade ---------- */
+
+@media (max-width: 860px) {
+  .auth {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding: 24px 24px 0;
+  }
+
+  .hero h1,
+  .hero p {
+    display: none;
+  }
+
+  .shelf {
+    margin-top: 18px;
+  }
+
+  .shelf i {
+    height: calc(var(--h) * .55);
+  }
+
+  .pane {
+    align-items: flex-start;
+    padding-top: 28px;
+  }
+
+  .box {
+    padding: 26px 20px;
+    border-radius: 16px;
+  }
+
+  .box h2 {
+    font-size: 26px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div id="app"></div>
+
+
+<!-- =====================================================
+     LÓGICA E TELAS
+     ===================================================== -->
+<script>
+
+/* ===== 1. Estado e utilidades ===== */
+
+const DAY = 864e5, HR = 36e5;
+let S, flash = null, tab = 'cat', phoneUid = 1;
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fd = d => new Date(d).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+const fh = d => new Date(d).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+const U = id => S.users.find(u => u.id == id), B = id => S.books.find(b => b.id == id);
+const val = id => document.getElementById(id).value;
+const rnd6 = () => String(Math.floor(Math.random() * 1e6)).padStart(6, '0');
+
+
+/* ===== 2. Dados de exemplo ===== */
+
+function seed(){
+  const n = new Date(2026, 10, 11, 10, 0).getTime();
+  const t = ['Dom Casmurro|Machado de Assis','O Cortiço|Aluísio Azevedo','Iracema|José de Alencar','Vidas Secas|Graciliano Ramos','Capitães da Areia|Jorge Amado','Memórias Póstumas|Machado de Assis','A Moreninha|Joaquim Manuel de Macedo','Quincas Borba|Machado de Assis','Triste Fim de Policarpo Quaresma|Lima Barreto','O Guarani|José de Alencar'];
+
+  S = {now:n, me:null, pend:null, rq:null, scr:'login', ph:0, nid:100, sent:{},
+   users:[
+    {id:1, name:'Maria', mat:'M001', email:'maria@escola.com', phone:'5566999000001', pw:'senha1234', role:'aluno', ver:1, opt:1},
+    {id:2, name:'João', mat:'M002', email:'joao@escola.com', phone:'5566999000002', pw:'senha1234', role:'aluno', ver:1, opt:1},
+    {id:3, name:'Bia (bibliotecária)', mat:'BIB1', email:'bia@escola.com', phone:'5566999000003', pw:'senha1234', role:'bib', ver:1, opt:1}],
+   books:t.map((x, i) => ({id:i+1, title:x.split('|')[0], author:x.split('|')[1], st:'disp'})),
+   loans:[], res:[], msgs:[]};
+
+  S.books[0].st = 'emp'; S.books[3].st = 'emp';
+  S.loans.push({id:1, book:1, user:2, start:n-4*DAY, due:n+3*DAY, ret:null, ren:0}, {id:2, book:4, user:1, start:n-2*DAY, due:n+5*DAY, ret:null, ren:0});
+}
+
+
+/* ===== 3. Regras de empréstimo, reservas e avisos ===== */
+
+const quiet = () => {const h = new Date(S.now).getHours(); return h >= 22 || h < 7};
+function send(uid, text, kind = 'aviso'){S.msgs.push({uid, text, kind, at:S.now, me:0})}
+function once(key, uid, text){if(S.sent[key]) return; S.sent[key] = 1; send(uid, text)}
+const canMsg = u => u.ver && u.opt;
+const actLoans = uid => S.loans.filter(l => l.user == uid && !l.ret);
+
+function promote(bid){
+  const r = S.res.filter(x => x.book == bid && x.st == 'fila')[0], b = B(bid);
+  if(r){r.st = 'aguard'; r.nt = null; b.st = 'res'} else b.st = 'disp';
+  notify();
+}
+
+function notify(){
+  S.res.filter(r => r.st == 'aguard' && !r.nt).forEach(r => {
+    const u = U(r.user);
+    if(!canMsg(u)){r.nt = S.now; return}
+    if(quiet()) return;
+    once('disp' + r.id, u.id, `Bibli: o livro “${B(r.book).title}” que você reservou já está disponível. Retire em até 48 horas.`);
+    r.nt = S.now;
+  });
+}
+
+function expire(){S.res.filter(r => r.st == 'aguard' && r.nt && r.nt <= S.now - 48*HR).forEach(r => {r.st = 'exp'; promote(r.book)})}
+
+function tick(){
+  expire(); notify();
+  if(quiet()) return;
+  S.loans.filter(l => !l.ret).forEach(l => {
+    const u = U(l.user); if(!canMsg(u)) return;
+    const t = B(l.book).title;
+    if(S.now >= l.due){const d = Math.floor((S.now - l.due)/DAY); once(`atr${l.id}_${Math.floor(d/3)}`, u.id, `Bibli: “${t}” está atrasado há ${d} dia(s). Devolva assim que puder.`)}
+    else if(new Date(S.now).toDateString() == new Date(l.due).toDateString() || new Date(S.now) > new Date(l.due).setHours(0,0,0,0)) once(`lem${l.id}_1`, u.id, `Bibli: hoje é o dia de devolver “${t}”.`);
+    else if(S.now >= l.due - 2*DAY) once(`lem${l.id}_0`, u.id, `Bibli: devolva “${t}” até ${fd(l.due)}. Responda RENOVAR para ganhar mais 7 dias.`);
+  });
+}
+
+function renewFor(uid){
+  const l = actLoans(uid).sort((a, b) => a.due - b.due)[0];
+  if(!l) throw Error('Você não tem livros emprestados');
+  if(l.ren) throw Error('Este empréstimo já foi renovado uma vez');
+  if(l.due < S.now) throw Error('O livro está atrasado, devolva na biblioteca');
+  if(S.res.some(r => r.book == l.book && (r.st == 'fila' || r.st == 'aguard'))) throw Error('Outro aluno reservou este livro');
+  l.due += 7*DAY; l.ren = 1; return `prazo renovado até ${fd(l.due)}`;
+}
+
+function sendCode(u, kind){
+  const c = rnd6();
+  if(kind == 'ver'){u.code = c; send(u.id, `Bibli: seu código de verificação é ${c}`, 'codigo')}
+  else{u.rc = c; send(u.id, `Bibli: seu código para redefinir a senha é ${c}`, 'codigo')}
+  phoneUid = u.id; S.ph = 1;
+}
+
+
+/* ===== 4. Ações (login, cadastro, recuperação de senha, empréstimos) ===== */
+
+const A = {
+
+  /* --- Entrada --- */
+  nav(s){S.scr = s; flash = null},
+
+  login(){
+    const u = S.users.find(x => x.email == val('em').trim().toLowerCase() && x.pw == val('pw'));
+    if(!u) throw Error('E-mail ou senha incorretos. Confira os dados ou toque em “Esqueci minha senha”.');
+    if(!u.ver){S.pend = u.id; sendCode(u, 'ver'); S.scr = 'ver'; return}
+    S.me = u.id; tab = u.role == 'aluno' ? 'cat' : 'emp'; phoneUid = u.role == 'aluno' ? u.id : 1; S.ph = 0; flash = null;
+  },
+
+  quick(e){document.getElementById('em').value = e; document.getElementById('pw').value = 'senha1234'},
+
+  /* --- Criar conta --- */
+  reg(){
+    const f = ['nm','ma','em2','wp','pw2','pw3'].map(val).map(x => x.trim());
+    f[4] = val('pw2'); f[5] = val('pw3');
+    if(!f[0] || !/^\w{3,20}$/.test(f[1])) throw Error('Preencha nome e matrícula (3 a 20 letras ou números)');
+    if(!/^[^@\s]+@[^@\s]+\.\w+$/.test(f[2])) throw Error('E-mail inválido');
+    if(!/^\d{10,13}$/.test(f[3])) throw Error('WhatsApp inválido: use só números, com DDD');
+    if(f[4].length < 8) throw Error('A senha precisa ter 8 caracteres ou mais');
+    if(f[4] != f[5]) throw Error('As senhas não são iguais');
+    f[2] = f[2].toLowerCase();
+    if(S.users.some(u => u.email == f[2] || u.phone == f[3] || u.mat == f[1])) throw Error('Matrícula, e-mail ou WhatsApp já cadastrado. Tente entrar ou recuperar a senha.');
+    const u = {id:++S.nid, name:f[0], mat:f[1], email:f[2], phone:f[3], pw:f[4], role:'aluno', ver:0, opt:1};
+    S.users.push(u); S.pend = u.id; sendCode(u, 'ver'); S.scr = 'ver';
+  },
+
+  resend(){const u = U(S.pend); sendCode(u, 'ver'); flash = {t:'ok', m:'Enviamos um novo código para o seu WhatsApp.'}},
+
+  ver(){
+    const u = U(S.pend);
+    if(val('cd').trim() != u.code) throw Error('Código incorreto. Confira a mensagem no WhatsApp.');
+    u.ver = 1; u.code = null; S.pend = null; S.me = u.id; tab = 'cat'; S.ph = 0; flash = {t:'ok', m:'WhatsApp confirmado! Sua conta está pronta.'};
+  },
+
+  /* --- Recuperar senha --- */
+  forgot(){
+    const e = val('fe').trim().toLowerCase();
+    if(!/^[^@\s]+@[^@\s]+\.\w+$/.test(e)) throw Error('Digite um e-mail válido');
+    const u = S.users.find(x => x.email == e);
+    if(u) sendCode(u, 'rc');
+    S.rq = e; S.scr = 'reset'; flash = null;
+  },
+
+  reset(){
+    const u = S.users.find(x => x.email == S.rq);
+    if(!u || !u.rc || val('rc').trim() != u.rc) throw Error('Código incorreto ou expirado. Peça um novo código.');
+    const p = val('np');
+    if(p.length < 8) throw Error('A nova senha precisa ter 8 caracteres ou mais');
+    if(p != val('np2')) throw Error('As senhas não são iguais');
+    u.pw = p; u.rc = null; S.rq = null; S.scr = 'login'; S.ph = 0; flash = {t:'ok', m:'Senha redefinida! Entre com a nova senha.'};
+  },
+
+  out(){S.me = null; S.pend = null; S.scr = 'login'; flash = null; S.ph = 0},
+
+  /* --- Aluno --- */
+  reserve(bid){
+    const b = B(bid), me = S.me;
+    if(b.st == 'disp') throw Error('Livro disponível, retire na biblioteca');
+    if(S.loans.some(l => l.book == bid && l.user == me && !l.ret)) throw Error('Você já está com este livro');
+    if(S.res.some(r => r.book == bid && r.user == me && (r.st == 'fila' || r.st == 'aguard'))) throw Error('Você já reservou este livro');
+    S.res.push({id:++S.nid, book:bid, user:me, st:'fila', nt:null});
+    flash = {t:'ok', m:'Reserva feita! Você entrou na fila.'};
+  },
+
+  renew(){flash = {t:'ok', m:'Renovado: ' + renewFor(S.me)}},
+
+  /* --- Bibliotecária --- */
+  checkout(){
+    const uid = +val('su'), bid = +val('sb'), b = B(bid);
+    if(!bid) throw Error('Escolha um livro');
+    if(S.loans.some(l => l.user == uid && !l.ret && l.due < S.now)) throw Error('Aluno com livro atrasado');
+    if(actLoans(uid).length >= 3) throw Error('Limite de 3 livros por aluno');
+    let r = null;
+    if(b.st == 'res'){r = S.res.find(x => x.book == bid && x.user == uid && x.st == 'aguard'); if(!r) throw Error('Livro reservado para outro aluno')}
+    if(r) r.st = 'ret';
+    S.loans.push({id:++S.nid, book:bid, user:uid, start:S.now, due:S.now+7*DAY, ret:null, ren:0});
+    b.st = 'emp'; flash = {t:'ok', m:'Empréstimo registrado: prazo de 7 dias.'};
+  },
+
+  ret(lid){const l = S.loans.find(x => x.id == lid); l.ret = S.now; promote(l.book); flash = {t:'ok', m:'Devolução registrada.'}},
+
+  /* --- Simulador e WhatsApp --- */
+  adv(h){S.now += h*HR; tick(); flash = {t:'ok', m:'Tempo avançado. Agora: ' + fh(S.now)}},
+
+  say(){
+    const t = val('inp').trim(); if(!t) return;
+    const u = U(phoneUid); S.msgs.push({uid:u.id, text:t, kind:'user', at:S.now, me:1});
+    const c = t.toUpperCase(); let r;
+    if(c == 'SAIR'){u.opt = 0; r = 'Bibli: pronto, você não vai mais receber avisos.'}
+    else if(c == 'RENOVAR'){try{r = 'Bibli: ' + renewFor(u.id) + '.'}catch(e){r = 'Bibli: ' + e.message.toLowerCase() + '.'}}
+    else r = 'Bibli: responda RENOVAR para renovar o livro ou SAIR para parar os avisos.';
+    send(u.id, r, 'resposta');
+  },
+
+  reset_demo(){seed(); flash = null; tab = 'cat'; phoneUid = 1},
+  tab(t){tab = t},
+  pv(v){phoneUid = +v},
+  tog(){S.ph = S.ph ? 0 : 1},
+  q(v){S.q = v}
+};
+
+function go(a, ...x){
+  flash = null;
+  try{A[a](...x)}catch(e){
+    const el = document.getElementById('err');
+    if(!S.me && el){el.textContent = e.message; el.hidden = false; return}
+    flash = {t:'bad', m:e.message};
+  }
+  render();
+}
+
+
+/* ===== 5. Telas: entrada ===== */
+
+const fld = (id, label, type = 'text', extra = '') => `<label for="${id}">${label}<input id="${id}" type="${type}" ${extra}></label>`;
+const frm = (act, inner) => `<form class="g" onsubmit="go('${act}');return false" novalidate><div class="err" id="err" role="alert" hidden></div>${inner}</form>`;
+const fl = () => flash ? `<div class="${flash.t == 'ok' ? 'good' : 'err'}" role="status">${esc(flash.m)}</div>` : '';
+
+function auth(){
+  const spines = [[22,150,'#f2a541'],[16,120,'#1f7a6e'],[26,170,'#c8d3ea'],[18,135,'#b3314d'],[24,185,'#5b7fd6'],[16,110,'#f2a541'],[28,160,'#e8eef9'],[20,190,'#1f7a6e'],[17,125,'#8a5cc8'],[24,150,'#f2a541'],[18,175,'#c8d3ea'],[22,115,'#b3314d'],[26,165,'#5b7fd6'],[16,140,'#1f7a6e'],[20,180,'#e8eef9']]
+   .map(s => `<i style="--w:${s[0]}px;--h:${s[1]}px;--c:${s[2]}"></i>`).join('');
+
+  const hero = `<aside class="hero"><div><div class="logo">📚 Bibli</div><h1>Reserve, renove e receba avisos no WhatsApp.</h1><p>A biblioteca da sua escola, no celular. Veja o catálogo, entre na fila e nunca mais perca o prazo de devolução.</p></div><div class="shelf" aria-hidden="true">${spines}</div></aside>`;
+
+  const sc = S.scr; let v;
+
+  /* Tela 1: login */
+  if(sc == 'login') v = `<h2>Entrar na Bibli</h2><p>Use o e-mail e a senha cadastrados na escola.</p>${fl()}${frm('login',
+    fld('em','E-mail','email','autocomplete="email" inputmode="email" placeholder="voce@escola.com"') +
+    fld('pw','Senha','password','autocomplete="current-password"') +
+    `<div class="split"><span></span><button type="button" class="lnk" onclick="go('nav','forgot')">Esqueci minha senha</button></div><button type="submit">Entrar</button>`)}
+    <div class="alt"><span class="mut">Ainda não tem conta?</span><button class="s" onclick="go('nav','reg')">Criar conta</button></div>
+    <details class="demo"><summary>Contas de demonstração</summary><div><button class="s" onclick="A.quick('maria@escola.com')">Maria (aluna)</button><button class="s" onclick="A.quick('joao@escola.com')">João (aluno)</button><button class="s" onclick="A.quick('bia@escola.com')">Bia (bibliotecária)</button></div><p class="mut">Os atalhos preenchem o formulário. Depois é só tocar em Entrar.</p></details>`;
+
+  /* Tela 2: criar conta */
+  else if(sc == 'reg') v = `<div class="step">Etapa 1 de 2: seus dados</div><h2>Criar conta</h2><p>Enviaremos um código para o seu WhatsApp na próxima etapa.</p>${frm('reg',
+    fld('nm','Nome','text','autocomplete="name"') + fld('ma','Matrícula','text','autocomplete="off"') +
+    fld('em2','E-mail','email','autocomplete="email"') + fld('wp','WhatsApp com DDD (só números)','tel','inputmode="numeric" placeholder="66999000000"') +
+    fld('pw2','Senha (8 caracteres ou mais)','password','autocomplete="new-password"') + fld('pw3','Repita a senha','password','autocomplete="new-password"') +
+    `<button type="submit">Continuar</button>`)}
+    <div class="alt"><button class="lnk" onclick="go('nav','login')">Já tenho conta. Entrar</button></div>`;
+
+  /* Tela 3: confirmar WhatsApp */
+  else if(sc == 'ver'){const u = U(S.pend); v = `<div class="step">Etapa 2 de 2: confirme seu WhatsApp</div><h2>Digite o código</h2><p>Enviamos 6 dígitos para o número final ${esc(u.phone.slice(-4))}. Abra o botão verde de WhatsApp para ver a mensagem.</p>${fl()}${frm('ver',
+    fld('cd','Código de verificação','text','inputmode="numeric" maxlength="6" autocomplete="one-time-code" class="code"') + `<button type="submit">Confirmar e entrar</button>`)}
+    <div class="alt"><button class="lnk" onclick="go('resend')">Enviar um novo código</button><button class="lnk" onclick="go('nav','login')">Voltar para o login</button></div>`}
+
+  /* Tela 4: recuperar senha */
+  else if(sc == 'forgot') v = `<div class="step">Etapa 1 de 2: identifique sua conta</div><h2>Recuperar senha</h2><p>Digite o e-mail da conta. Se ele estiver cadastrado, enviaremos um código para o WhatsApp.</p>${frm('forgot',
+    fld('fe','E-mail','email','autocomplete="email" inputmode="email"') + `<button type="submit">Enviar código</button>`)}
+    <div class="alt"><button class="lnk" onclick="go('nav','login')">Voltar para o login</button></div>`;
+
+  /* Tela 5: nova senha */
+  else v = `<div class="step">Etapa 2 de 2: nova senha</div><h2>Criar nova senha</h2><p>Digite o código que chegou no WhatsApp e escolha uma senha nova.</p>${frm('reset',
+    fld('rc','Código','text','inputmode="numeric" maxlength="6" autocomplete="one-time-code" class="code"') +
+    fld('np','Nova senha (8 caracteres ou mais)','password','autocomplete="new-password"') + fld('np2','Repita a nova senha','password','autocomplete="new-password"') +
+    `<button type="submit">Salvar nova senha</button>`)}
+    <div class="alt"><button class="lnk" onclick="go('nav','forgot')">Pedir outro código</button><button class="lnk" onclick="go('nav','login')">Voltar para o login</button></div>`;
+
+  return `<div class="auth">${hero}<section class="pane"><div class="box">${v}</div></section></div>`;
+}
+
+
+/* ===== 6. Telas: sistema ===== */
+
+function student(){
+  const me = U(S.me), mine = S.loans.filter(l => l.user == me.id);
+  let h = `<div class="tabs"><button class="${tab == 'cat' ? 'on' : ''}" onclick="go('tab','cat')">Catálogo</button><button class="${tab == 'my' ? 'on' : ''}" onclick="go('tab','my')">Meus livros</button></div>`;
+
+  if(tab == 'cat'){
+    const q = (S.q || '').toLowerCase();
+    h += `<div class="card"><input placeholder="Buscar por título ou autor" aria-label="Buscar livros" value="${esc(S.q || '')}" oninput="A.q(this.value);render(true)">` +
+    S.books.filter(b => (b.title + b.author).toLowerCase().includes(q)).map(b => {
+      const mr = S.res.find(r => r.book == b.id && r.user == me.id && (r.st == 'fila' || r.st == 'aguard'));
+      const pos = mr ? S.res.filter(r => r.book == b.id && r.st == 'fila' && r.id <= mr.id).length : 0;
+      const lab = b.st == 'disp' ? '<span class="tag ok">Disponível</span>' : `<span class="tag">${b.st == 'res' ? 'Reservado' : 'Emprestado'}</span>`;
+      const btn = b.st == 'disp' ? '<span class="mut">Retire na biblioteca</span>' : mr ? `<span class="mut">${mr.st == 'aguard' ? 'Sua vez! Retire em 48 h' : 'Na fila: posição ' + pos}</span>` : `<button onclick="go('reserve',${b.id})">Reservar</button>`;
+      return `<div class="row"><div><b>${esc(b.title)}</b><div class="mut">${esc(b.author)}</div></div><div class="inl" style="flex:0 0 auto;align-items:center">${lab}${btn}</div></div>`}).join('') + `</div>`;
+  }else{
+    const act = mine.filter(l => !l.ret), rs = S.res.filter(r => r.user == me.id && (r.st == 'fila' || r.st == 'aguard'));
+    h += `<div class="card"><h2>Empréstimos ativos (${act.length}/3)</h2>${act.length ? act.map(l => `<div class="row"><div><b>${esc(B(l.book).title)}</b><div class="mut">Devolver até ${fh(l.due)} ${l.due < S.now ? '<span class="bad">(atrasado)</span>' : ''}</div></div><button onclick="go('renew')" ${l.ren ? 'disabled' : ''}>${l.ren ? 'Já renovado' : 'Renovar +7 dias'}</button></div>`).join('') : '<p class="mut">Nenhum livro com você agora. Reserve um no catálogo.</p>'}</div>
+    <div class="card"><h2>Minhas reservas</h2>${rs.length ? rs.map(r => `<div class="row"><b>${esc(B(r.book).title)}</b><span class="tag">${r.st == 'aguard' ? 'Aguardando retirada' : 'Na fila'}</span></div>`).join('') : '<p class="mut">Nenhuma reserva.</p>'}</div>
+    <div class="card"><h2>Histórico</h2>${mine.filter(l => l.ret).map(l => `<div class="row"><span>${esc(B(l.book).title)}</span><span class="mut">devolvido em ${fd(l.ret)}</span></div>`).join('') || '<p class="mut">Nada devolvido ainda.</p>'}</div>`;
+  }
+  return h;
+}
+
+function staff(){
+  const al = S.users.filter(u => u.role == 'aluno'), av = S.books.filter(b => b.st != 'emp');
+  let h = `<div class="tabs"><button class="${tab == 'emp' ? 'on' : ''}" onclick="go('tab','emp')">Empréstimos</button><button class="${tab == 'fila' ? 'on' : ''}" onclick="go('tab','fila')">Filas e atrasos</button></div>`;
+
+  if(tab == 'emp'){
+    h += `<div class="card"><h2>Registrar empréstimo</h2><div class="inl"><select id="su" aria-label="Aluno">${al.map(u => `<option value="${u.id}">${esc(u.name)} (${u.mat})</option>`).join('')}</select><select id="sb" aria-label="Livro">${av.map(b => `<option value="${b.id}">${esc(b.title)}${b.st == 'res' ? ' (reservado)' : ''}</option>`).join('')}</select><button onclick="go('checkout')">Emprestar</button></div></div>
+    <div class="card"><h2>Livros emprestados</h2>${S.loans.filter(l => !l.ret).map(l => `<div class="row"><div><b>${esc(B(l.book).title)}</b><div class="mut">${esc(U(l.user).name)}, devolver até ${fh(l.due)} ${l.due < S.now ? '<span class="bad">(atrasado)</span>' : ''}</div></div><button onclick="go('ret',${l.id})">Registrar devolução</button></div>`).join('') || '<p class="mut">Nenhum.</p>'}</div>`;
+  }else{
+    const q = S.res.filter(r => r.st == 'fila' || r.st == 'aguard'), late = S.loans.filter(l => !l.ret && l.due < S.now);
+    h += `<div class="card"><h2>Fila de reservas</h2>${q.length ? q.map(r => `<div class="row"><div><b>${esc(B(r.book).title)}</b><div class="mut">${esc(U(r.user).name)}</div></div><span class="tag">${r.st == 'aguard' ? 'Aguardando retirada' : 'Na fila'}</span></div>`).join('') : '<p class="mut">Ninguém na fila.</p>'}</div>
+    <div class="card"><h2>Atrasos</h2>${late.length ? late.map(l => `<div class="row"><span>${esc(B(l.book).title)}, ${esc(U(l.user).name)}</span><span class="bad">${Math.floor((S.now - l.due)/DAY)} dia(s)</span></div>`).join('') : '<p class="mut">Nenhum atraso.</p>'}</div>`;
+  }
+  return h;
+}
+
+function shell(me){
+  const f = flash ? `<div class="flash ${flash.t}" role="status">${esc(flash.m)}</div>` : '';
+  const first = esc(me.name.split(' ')[0]);
+  return `<header class="top"><span class="logo">📚 Bibli</span><button class="s" onclick="go('out')">Sair</button></header>
+  <div class="sim"><span>🕒 ${fh(S.now)}</span><span class="mut">Simulador:</span><button class="s" onclick="go('adv',12)">+12 h</button><button class="s" onclick="go('adv',24)">+1 dia</button><button class="s" onclick="go('adv',72)">+3 dias</button><button class="s" onclick="go('reset_demo')">Reiniciar</button></div>
+  <main><div class="hello"><h1>Olá, ${first}</h1><div class="mut">${me.role == 'aluno' ? 'Aluno(a)' : 'Bibliotecária'}</div></div>${f}${me.role == 'aluno' ? student() : staff()}
+  <details class="card"><summary>Roteiro para apresentar</summary><ol><li>Entre como Maria e veja o catálogo.</li><li>Reserve “Dom Casmurro”, que está com o João.</li><li>Entre como bibliotecária e registre a devolução: o aviso chega no WhatsApp da Maria.</li><li>Clique em +3 dias: lembretes de devolução chegam sozinhos.</li><li>No WhatsApp, digite RENOVAR para renovar.</li></ol><p class="mut">Tudo é simulado no navegador. Nenhuma mensagem real é enviada.</p></details></main>`;
+}
+
+
+/* ===== 7. WhatsApp simulado e desenho da página ===== */
+
+function phone(){
+  const ms = S.msgs.filter(m => m.uid == phoneUid);
+  const opts = S.users.map(u => `<option value="${u.id}" ${u.id == phoneUid ? 'selected' : ''}>${esc(u.name.split(' ')[0])}</option>`).join('');
+  const d = S.ph ? `<div class="drawer"><div class="scr"><div class="ph"><span>WhatsApp</span><select aria-label="Celular de" onchange="go('pv',this.value)">${opts}</select><button aria-label="Fechar" onclick="go('tog')">×</button></div>
+  <div class="msgs" id="msgs">${ms.length ? ms.map(m => `<div class="b ${m.me ? 'me' : ''}">${esc(m.text)}<small>${fh(m.at)}</small></div>`).join('') : '<p class="mut" style="text-align:center">Nenhuma mensagem ainda</p>'}</div>
+  <form class="in" onsubmit="go('say');return false"><input id="inp" aria-label="Mensagem" placeholder="Responda: RENOVAR ou SAIR"><button>Enviar</button></form></div></div>` : '';
+  const n = S.msgs.filter(m => m.uid == phoneUid && !m.me).length;
+  return `${d}<button class="fab" onclick="go('tog')" aria-label="Abrir WhatsApp simulado">💬 WhatsApp${n ? `<b>${n}</b>` : ''}</button>`;
+}
+
+function render(keep){
+  const me = S.me ? U(S.me) : null;
+  document.getElementById('app').innerHTML = (me ? shell(me) : auth()) + phone();
+  const m = document.getElementById('msgs'); if(m) m.scrollTop = m.scrollHeight;
+  if(keep){const i = document.querySelector('input[oninput]'); if(i){i.focus(); i.setSelectionRange(i.value.length, i.value.length)}}
+}
+
+
+/* ===== Início ===== */
+seed(); tick(); render();
+
+</script>
+
+</body>
+</html>
